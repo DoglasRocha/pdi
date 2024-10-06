@@ -16,9 +16,9 @@ INPUT_IMAGE = "arroz.bmp"
 
 NEGATIVO = False
 THRESHOLD = 0.775
-ALTURA_MIN = 10
-LARGURA_MIN = 10
-N_PIXELS_MIN = 10
+ALTURA_MIN = 3
+LARGURA_MIN = 3
+N_PIXELS_MIN = 4
 
 # INPUT_IMAGE = "documento-3mp.bmp"
 
@@ -40,10 +40,6 @@ def binariza(img, threshold):
 
     Valor de retorno: versão binarizada da img_in."""
 
-    # TODO: escreva o código desta função.
-    # Dica/desafio: usando a função np.where, dá para fazer a binarização muito
-    # rapidamente, e com apenas uma linha de código!
-
     img = np.where(img < threshold, 0.0, 1.0)
     return img
 
@@ -51,27 +47,28 @@ def binariza(img, threshold):
 # -------------------------------------------------------------------------------
 
 
-def flood_fill(img, label, row, col, channel, dados_rotulo):
+def inunda(img, label, row, col, channel, dados_rotulo):
+    # vizinhança-8
     for y in range(row - 1, row + 2):
+        if 0 > y or y >= len(img):
+            continue
+
         for x in range(col - 1, col + 2):
-            if 0 > y or y > len(img):
-                continue
-            if 0 > x or x > len(img[0]):
+            if 0 > x or x >= len(img[y]):
                 continue
 
             if img[y][x][channel] == 1:
                 img[y][x][channel] = label
-                dados_rotulo["n_pixels"] += 1
-                if y < dados_rotulo["T"]:
-                    dados_rotulo["T"] = y
-                if y > dados_rotulo["B"]:
-                    dados_rotulo["B"] = y
-                if x < dados_rotulo["L"]:
-                    dados_rotulo["L"] = x
-                if x > dados_rotulo["R"]:
-                    dados_rotulo["R"] = x
 
-                flood_fill(img, label, y, x, channel, dados_rotulo)
+                dados_rotulo["n_pixels"] += 1
+
+                dados_rotulo["T"] = min(y, dados_rotulo["T"])
+                dados_rotulo["B"] = max(y, dados_rotulo["B"])
+
+                dados_rotulo["L"] = min(x, dados_rotulo["L"])
+                dados_rotulo["R"] = max(x, dados_rotulo["R"])
+
+                inunda(img, label, y, x, channel, dados_rotulo)
 
 
 def rotula(img, largura_min, altura_min, n_pixels_min):
@@ -91,10 +88,9 @@ def rotula(img, largura_min, altura_min, n_pixels_min):
     'T', 'L', 'B', 'R': coordenadas do retângulo envolvente de um componente conexo,
     respectivamente: topo, esquerda, baixo e direita."""
 
-    # TODO: escreva esta função.
-    # Use a abordagem com flood fill recursivo.
     label = 2
     componentes = []
+    # inundação
     for row in range(len(img)):
         for col in range(len(img[row])):
             for channel in range(len(img[row][col])):
@@ -107,16 +103,19 @@ def rotula(img, largura_min, altura_min, n_pixels_min):
                         "B": row,
                         "R": col,
                     }
-                    flood_fill(img, label, row, col, channel, dados_componente)
+                    inunda(img, label, row, col, channel, dados_componente)
                     componentes.append(dados_componente)
                     label += 1
 
+    # limpa ruídos
     for index, componente in enumerate(componentes):
         if componente["n_pixels"] < n_pixels_min:
             componentes[index] = None
-        if componente["R"] - componente["L"] < largura_min:
+
+        elif componente["R"] - componente["L"] < largura_min:
             componentes[index] = None
-        if componente["B"] - componente["T"] < altura_min:
+
+        elif componente["B"] - componente["T"] < altura_min:
             componentes[index] = None
 
     componentes = [componente for componente in componentes if componente != None]
