@@ -64,7 +64,7 @@ def inunda(img, label, row, col, channel, dados_rotulo=None):
             continue
 
         for neighbour_col in range(col - 1, col + 2):
-            if 0 > neighbour_col or neighbour_col >= len(img[y]):
+            if 0 > neighbour_col or neighbour_col >= len(img[neighbour_row]):
                 continue
 
             if img[neighbour_row][neighbour_col][channel] == 1:
