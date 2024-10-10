@@ -47,7 +47,17 @@ def binariza(img, threshold):
 # -------------------------------------------------------------------------------
 
 
-def inunda(img, label, row, col, channel, dados_rotulo):
+def inunda(img, label, row, col, channel, dados_rotulo=None):
+    if dados_rotulo == None:
+        dados_rotulo = {
+            "label": label,
+            "n_pixels": 1,
+            "T": row,
+            "L": col,
+            "B": row,
+            "R": col,
+        }
+
     # vizinhança-8
     for y in range(row - 1, row + 2):
         if 0 > y or y >= len(img):
@@ -70,6 +80,8 @@ def inunda(img, label, row, col, channel, dados_rotulo):
 
                 inunda(img, label, y, x, channel, dados_rotulo)
 
+    return dados_rotulo
+
 
 def rotula(img, largura_min, altura_min, n_pixels_min):
     """Rotulagem usando flood fill. Marca os objetos da imagem com os valores
@@ -88,37 +100,25 @@ def rotula(img, largura_min, altura_min, n_pixels_min):
     'T', 'L', 'B', 'R': coordenadas do retângulo envolvente de um componente conexo,
     respectivamente: topo, esquerda, baixo e direita."""
 
-    label = 2
+    label = 0.1
     componentes = []
     # inundação
     for row in range(len(img)):
         for col in range(len(img[row])):
             for channel in range(len(img[row][col])):
-                if img[row][col][channel] == 1:
-                    dados_componente = {
-                        "label": label,
-                        "n_pixels": 1,
-                        "T": row,
-                        "L": col,
-                        "B": row,
-                        "R": col,
-                    }
-                    inunda(img, label, row, col, channel, dados_componente)
-                    componentes.append(dados_componente)
-                    label += 1
+                if img[row][col][channel] != 1:
+                    continue
 
-    # limpa ruídos
-    for index, componente in enumerate(componentes):
-        if componente["n_pixels"] < n_pixels_min:
-            componentes[index] = None
+                dados_componente = inunda(img, label, row, col, channel)
+                if (
+                    dados_componente["n_pixels"] < n_pixels_min
+                    or dados_componente["R"] - dados_componente["L"] < largura_min
+                    or dados_componente["B"] - dados_componente["T"] < altura_min
+                ):
+                    continue
+                componentes.append(dados_componente)
+                label += 0.1
 
-        elif componente["R"] - componente["L"] < largura_min:
-            componentes[index] = None
-
-        elif componente["B"] - componente["T"] < altura_min:
-            componentes[index] = None
-
-    componentes = [componente for componente in componentes if componente != None]
     return componentes
 
 
