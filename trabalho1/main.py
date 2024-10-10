@@ -59,26 +59,26 @@ def inunda(img, label, row, col, channel, dados_rotulo=None):
         }
 
     # vizinhança-8
-    for y in range(row - 1, row + 2):
-        if 0 > y or y >= len(img):
+    for neighbour_row in range(row - 1, row + 2):
+        if 0 > neighbour_row or neighbour_row >= len(img):
             continue
 
-        for x in range(col - 1, col + 2):
-            if 0 > x or x >= len(img[y]):
+        for neighbour_col in range(col - 1, col + 2):
+            if 0 > neighbour_col or neighbour_col >= len(img[y]):
                 continue
 
-            if img[y][x][channel] == 1:
-                img[y][x][channel] = label
+            if img[neighbour_row][neighbour_col][channel] == 1:
+                img[neighbour_row][neighbour_col][channel] = label
 
                 dados_rotulo["n_pixels"] += 1
 
-                dados_rotulo["T"] = min(y, dados_rotulo["T"])
-                dados_rotulo["B"] = max(y, dados_rotulo["B"])
+                dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
+                dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
 
-                dados_rotulo["L"] = min(x, dados_rotulo["L"])
-                dados_rotulo["R"] = max(x, dados_rotulo["R"])
+                dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
+                dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
 
-                inunda(img, label, y, x, channel, dados_rotulo)
+                inunda(img, label, neighbour_row, neighbour_col, channel, dados_rotulo)
 
     return dados_rotulo
 
@@ -116,6 +116,7 @@ def rotula(img, largura_min, altura_min, n_pixels_min):
                     or dados_componente["B"] - dados_componente["T"] < altura_min
                 ):
                     continue
+
                 componentes.append(dados_componente)
                 label += 0.1
 
