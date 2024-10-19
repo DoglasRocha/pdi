@@ -22,23 +22,28 @@ def open_image(img_path: str) -> cv2.typing.MatLike:
 def main():
     try:
         _, img_path, algorithm, w1, w2 = argv
-        w1 = int(w1)
-        w2 = int(w2)
+        window_width = int(w1)
+        window_height = int(w2)
     except:
         print(
             "Por favor, informe o caminho para a imagem, "
-            + "o algoritmo desejado, a largura da janela e a"
+            + "o algoritmo desejado, a largura e a"
             + " altura da janela"
         )
         exit()
 
     image = open_image(img_path)
-    result = blur.naive_algorithm(image, w1, w2)
+    if algorithm == "teste":
+        for algorithm_ in blur.algorithms.keys():
+            result = blur.algorithms[algorithm_](image, window_width, window_height)
+    else:
+        result = blur.algorithms[algorithm](image, window_width, window_height)
 
     cv2.imshow(f"{img_path} original", image)
-    cv2.imshow(f"{img_path} {algorithm} {w1}x{w2}", result)
+    cv2.imshow(f"{img_path} {algorithm} {window_width}x{window_height}", result)
     cv2.imwrite(
-        f"out/{os.path.basename(img_path)} {algorithm} {w1}x{w2}.png", result * 255
+        f"out/{os.path.basename(img_path)} {algorithm} {window_width}x{window_height}.png",
+        result * 255,
     )
     cv2.waitKey()
     cv2.destroyAllWindows()
