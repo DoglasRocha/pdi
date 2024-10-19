@@ -36,15 +36,22 @@ def main():
     if algorithm == "teste":
         for algorithm_ in blur.algorithms.keys():
             result = blur.algorithms[algorithm_](image, window_width, window_height)
+            cv2.imshow(f"{img_path} original", image)
+            cv2.imshow(
+                f"{img_path} {algorithm_} {window_width}x{window_height}", result
+            )
+            cv2.imwrite(
+                f"out/{os.path.basename(img_path)} {algorithm_} {window_width}x{window_height}.png",
+                result * 255,
+            )
     else:
         result = blur.algorithms[algorithm](image, window_width, window_height)
-
-    cv2.imshow(f"{img_path} original", image)
-    cv2.imshow(f"{img_path} {algorithm} {window_width}x{window_height}", result)
-    cv2.imwrite(
-        f"out/{os.path.basename(img_path)} {algorithm} {window_width}x{window_height}.png",
-        result * 255,
-    )
+        cv2.imshow(f"{img_path} original", image)
+        cv2.imshow(f"{img_path} {algorithm} {window_width}x{window_height}", result)
+        cv2.imwrite(
+            f"out/{os.path.basename(img_path)} {algorithm} {window_width}x{window_height}.png",
+            result * 255,
+        )
     cv2.waitKey()
     cv2.destroyAllWindows()
 
