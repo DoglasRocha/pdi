@@ -21,6 +21,8 @@ def measure_runtime(func: typing.Callable) -> typing.Callable:
 def naive_algorithm(
     img: cv2.typing.MatLike, width: int, height: int
 ) -> cv2.typing.MatLike:
+    window_size = width * height
+
     img_out = img.copy()
     for row in range(height // 2, len(img) - height // 2):
         for col in range(width // 2, len(img[row]) - width // 2):
@@ -30,7 +32,7 @@ def naive_algorithm(
                     for window_col in range(col - width // 2, col + width // 2 + 1):
                         sum_ += img[window_row][window_col][channel]
 
-                mean = sum_ / (width * height)
+                mean = sum_ / window_size
 
                 img_out[row][col][channel] = mean
     return img_out
@@ -82,11 +84,59 @@ def separable_filter(
 def integral_image(
     img: cv2.typing.MatLike, width: int, height: int
 ) -> cv2.typing.MatLike:
-    pass
+    integral_image = img.copy()
+
+    # horizontal
+    for row in range(len(img)):
+        for col in range(1, len(img[row])):
+            for channel in range(len(img[row][col])):
+                integral_image[row][col][channel] += integral_image[row][col - 1][
+                    channel
+                ]
+
+    # vertical
+    for row in range(1, len(img)):
+        for col in range(len(img[row])):
+            for channel in range(len(img[row][col])):
+                integral_image[row][col][channel] += integral_image[row - 1][col][
+                    channel
+                ]
+
+    img_out = img.copy()
+    for row in range(len(img_out)):
+        for col in range(len(img_out[row])):
+            for channel in range(len(img_out[row][col])):
+                if row == 0 and col == 0:
+                    value = integral_image[row][col][channel]
+
+                elif col == 0:
+                    value = (
+                        integral_image[row][col][channel]
+                        - integral_image[max(row - height, 0)][col][channel]
+                    ) / min(max(1, row), height)
+
+                elif row == 0:
+                    value = (
+                        integral_image[row][col][channel]
+                        - integral_image[row][max(0, col - width)][channel]
+                    ) / min(max(1, col), width)
+
+                else:
+                    value = (
+                        integral_image[row][col][channel]
+                        - integral_image[max(row - height, 0)][col][channel]
+                        - integral_image[row][max(col - width, 0)][channel]
+                        + integral_image[max(row - height, 0)][max(col - width, 0)][
+                            channel
+                        ]
+                    ) / (min(row, height) * min(col, width))
+                img_out[row][col][channel] = value
+
+    return img_out
 
 
 algorithms = {
     "ingenuo": naive_algorithm,
     "separavel": separable_filter,
-    # "integral": integral_image,
+    "integral": integral_image,
 }
