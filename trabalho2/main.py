@@ -33,7 +33,7 @@ def main():
         exit()
 
     image = open_image(img_path)
-    result = blur.naive_algoritm(image, w1, w2)
+    result = blur.naive_algorithm(image, w1, w2)
 
     cv2.imshow(f"{img_path} original", image)
     cv2.imshow(f"{img_path} {algorithm} {w1}x{w2}", result)
