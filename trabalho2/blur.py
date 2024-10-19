@@ -103,9 +103,11 @@ def integral_image(
                 ]
 
     img_out = img.copy()
-    for row in range(len(img_out)):
-        for col in range(len(img_out[row])):
-            for channel in range(len(img_out[row][col])):
+
+    # tripa de cima
+    for row in range(height):
+        for col in range(len(img[row])):
+            for channel in range(len(img[row][col])):
                 if row == 0 and col == 0:
                     value = integral_image[row][col][channel]
 
@@ -130,6 +132,42 @@ def integral_image(
                             channel
                         ]
                     ) / (min(row, height) * min(col, width))
+
+                img_out[row][col][channel] = value
+
+    # tripa do lado
+    for row in range(height, len(img)):
+        for col in range(width):
+            for channel in range(len(img[row][col])):
+                if col == 0:
+                    value = (
+                        integral_image[row][col][channel]
+                        - integral_image[max(row - height, 0)][col][channel]
+                    ) / min(max(1, row), height)
+
+                else:
+                    value = (
+                        integral_image[row][col][channel]
+                        - integral_image[max(row - height, 0)][col][channel]
+                        - integral_image[row][max(col - width, 0)][channel]
+                        + integral_image[max(row - height, 0)][max(col - width, 0)][
+                            channel
+                        ]
+                    ) / (min(row, height) * min(col, width))
+
+                img_out[row][col][channel] = value
+
+    # resto
+    window_size = height * width
+    for row in range(height, len(img_out)):
+        for col in range(width, len(img_out[row])):
+            for channel in range(len(img_out[row][col])):
+                value = (
+                    integral_image[row][col][channel]
+                    - integral_image[row - height][col][channel]
+                    - integral_image[row][col - width][channel]
+                    + integral_image[row - height][col - width][channel]
+                ) / window_size
                 img_out[row][col][channel] = value
 
     return img_out
