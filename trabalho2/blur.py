@@ -104,57 +104,49 @@ def integral_image(
 
     img_out = img.copy()
 
+    # primeiro pixel
+    for channel in range(len(img_out[0][0])):
+        img_out[0][0][channel] = integral_image[0][0][channel]
+
+    # tripinha de cima
+    for col in range(1, len(img[0])):
+        for channel in range(len(img[0][col])):
+            img_out[0][col][channel] = (
+                integral_image[0][col][channel]
+                - integral_image[0][max(0, col - width)][channel]
+            ) / min(col, width)
+
+    # tripinha do lado
+    for row in range(1, len(img)):
+        for channel in range(len(img[row][0])):
+            img_out[row][0][channel] = (
+                integral_image[row][0][channel]
+                - integral_image[max(0, row - height)][0][channel]
+            ) / min(row, height)
+
     # tripa de cima
-    for row in range(height):
-        for col in range(len(img[row])):
+    for row in range(1, height):
+        for col in range(1, len(img[row])):
             for channel in range(len(img[row][col])):
-                if row == 0 and col == 0:
-                    value = integral_image[row][col][channel]
-
-                elif col == 0:
-                    value = (
-                        integral_image[row][col][channel]
-                        - integral_image[max(row - height, 0)][col][channel]
-                    ) / min(max(1, row), height)
-
-                elif row == 0:
-                    value = (
-                        integral_image[row][col][channel]
-                        - integral_image[row][max(0, col - width)][channel]
-                    ) / min(max(1, col), width)
-
-                else:
-                    value = (
-                        integral_image[row][col][channel]
-                        - integral_image[max(row - height, 0)][col][channel]
-                        - integral_image[row][max(col - width, 0)][channel]
-                        + integral_image[max(row - height, 0)][max(col - width, 0)][
-                            channel
-                        ]
-                    ) / (min(row, height) * min(col, width))
+                value = (
+                    integral_image[row][col][channel]
+                    - integral_image[max(row - height, 0)][col][channel]
+                    - integral_image[row][max(col - width, 0)][channel]
+                    + integral_image[max(row - height, 0)][max(col - width, 0)][channel]
+                ) / (min(row, height) * min(col, width))
 
                 img_out[row][col][channel] = value
 
     # tripa do lado
     for row in range(height, len(img)):
-        for col in range(width):
+        for col in range(1, width):
             for channel in range(len(img[row][col])):
-                if col == 0:
-                    value = (
-                        integral_image[row][col][channel]
-                        - integral_image[max(row - height, 0)][col][channel]
-                    ) / min(max(1, row), height)
-
-                else:
-                    value = (
-                        integral_image[row][col][channel]
-                        - integral_image[max(row - height, 0)][col][channel]
-                        - integral_image[row][max(col - width, 0)][channel]
-                        + integral_image[max(row - height, 0)][max(col - width, 0)][
-                            channel
-                        ]
-                    ) / (min(row, height) * min(col, width))
-
+                value = (
+                    integral_image[row][col][channel]
+                    - integral_image[max(row - height, 0)][col][channel]
+                    - integral_image[row][max(col - width, 0)][channel]
+                    + integral_image[max(row - height, 0)][max(col - width, 0)][channel]
+                ) / (min(row, height) * min(col, width))
                 img_out[row][col][channel] = value
 
     # resto
