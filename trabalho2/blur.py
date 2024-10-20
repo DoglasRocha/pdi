@@ -18,7 +18,7 @@ def measure_runtime(func: typing.Callable) -> typing.Callable:
 
 
 @measure_runtime
-def naive_algorithm(
+def blur_naive_algorithm(
     img: cv2.typing.MatLike, width: int, height: int
 ) -> cv2.typing.MatLike:
     window_size = width * height
@@ -39,7 +39,7 @@ def naive_algorithm(
 
 
 @measure_runtime
-def separable_filter(
+def blur_separable_filter(
     img: cv2.typing.MatLike, width: int, height: int
 ) -> cv2.typing.MatLike:
     img_step_1 = img.copy()
@@ -80,10 +80,7 @@ def separable_filter(
     return img_out
 
 
-@measure_runtime
-def integral_image(
-    img: cv2.typing.MatLike, width: int, height: int
-) -> cv2.typing.MatLike:
+def build_integral_image(img: cv2.typing.MatLike):
     integral_image = img.copy()
 
     # horizontal
@@ -102,71 +99,39 @@ def integral_image(
                     channel
                 ]
 
+    return integral_image
+
+
+@measure_runtime
+def blur_integral_image(
+    img: cv2.typing.MatLike,
+    width: int,
+    height: int,
+) -> cv2.typing.MatLike:
+    integral_image = build_integral_image(img)
     img_out = img.copy()
 
-    # primeiro pixel
-    for channel in range(len(img_out[0][0])):
-        img_out[0][0][channel] = integral_image[0][0][channel]
+    W, H = width // 2, height // 2
 
-    # tripinha de cima
-    for col in range(1, len(img[0])):
-        for channel in range(len(img[0][col])):
-            img_out[0][col][channel] = (
-                integral_image[0][col][channel]
-                - integral_image[0][max(0, col - width)][channel]
-            ) / min(col, width)
-
-    # tripinha do lado
-    for row in range(1, len(img)):
-        for channel in range(len(img[row][0])):
-            img_out[row][0][channel] = (
-                integral_image[row][0][channel]
-                - integral_image[max(0, row - height)][0][channel]
-            ) / min(row, height)
-
-    # tripa de cima
-    for row in range(1, height):
-        for col in range(1, len(img[row])):
-            for channel in range(len(img[row][col])):
+    # sem borda
+    for row in range(0, img.shape[0]):
+        for col in range(0, img.shape[1]):
+            for channel in range(img.shape[2]):
+                t, b = max(0, row - H - 1), min(row + H, img.shape[0] - 1)
+                l, r = max(0, col - W - 1), min(col + W, img.shape[1] - 1)
                 value = (
-                    integral_image[row][col][channel]
-                    - integral_image[max(row - height, 0)][col][channel]
-                    - integral_image[row][max(col - width, 0)][channel]
-                    + integral_image[max(row - height, 0)][max(col - width, 0)][channel]
-                ) / (min(row, height) * min(col, width))
-
-                img_out[row][col][channel] = value
-
-    # tripa do lado
-    for row in range(height, len(img)):
-        for col in range(1, width):
-            for channel in range(len(img[row][col])):
-                value = (
-                    integral_image[row][col][channel]
-                    - integral_image[max(row - height, 0)][col][channel]
-                    - integral_image[row][max(col - width, 0)][channel]
-                    + integral_image[max(row - height, 0)][max(col - width, 0)][channel]
-                ) / (min(row, height) * min(col, width))
-                img_out[row][col][channel] = value
-
-    # resto
-    window_size = height * width
-    for row in range(height, len(img_out)):
-        for col in range(width, len(img_out[row])):
-            for channel in range(len(img_out[row][col])):
-                value = (
-                    integral_image[row][col][channel]
-                    - integral_image[row - height][col][channel]
-                    - integral_image[row][col - width][channel]
-                    + integral_image[row - height][col - width][channel]
-                ) / window_size
+                    integral_image[b][r][channel]
+                    - integral_image[t][r][channel]
+                    - integral_image[b][l][channel]
+                    + integral_image[t][l][channel]
+                ) / ((b - t) * (r - l))
                 img_out[row][col][channel] = value
 
     return img_out
 
 
 algorithms = {
-    "ingenuo": naive_algorithm,
-    "separavel": separable_filter,
-    "integral": integral_image,
+    "ingenuo": blur_naive_algorithm,
+    "separavel": blur_separable_filter,
+    "integral": blur_integral_image,
 }
