@@ -115,8 +115,6 @@ def blur_integral_image(
     img_out = img.copy()
 
     W, H = width // 2, height // 2
-
-    # sem borda
     for row in range(0, img.shape[0]):
         for col in range(0, img.shape[1]):
             for channel in range(img.shape[2]):
