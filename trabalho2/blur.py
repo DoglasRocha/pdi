@@ -84,7 +84,6 @@ def blur_separable_filter(
 
 def build_integral_image(img: cv2.typing.MatLike):
     integral_image = img.copy()
-
     # horizontal
     for row in range(len(img)):
         for col in range(1, len(img[row])):
@@ -137,5 +136,5 @@ def blur_integral_image(
 algorithms = {
     "ingenuo": blur_naive_algorithm,
     "separavel": blur_separable_filter,
-    "integral": blur_integral_image,
+    "com imagem integral": blur_integral_image,
 }
