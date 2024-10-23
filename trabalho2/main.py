@@ -43,8 +43,8 @@ def test(
                 result * 255,
             )
 
-            open_cv_correct_image = cv2.blur(img, w_size)
-            comparison = open_cv_correct_image - result
+            open_cv_right_image = cv2.blur(img, w_size)
+            comparison = open_cv_right_image - result
             norm_comparison = cv2.normalize(comparison, None, 0, 1, cv2.NORM_MINMAX)
             if show_images:
                 cv2.imshow(
