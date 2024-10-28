@@ -8,11 +8,9 @@ import typing
 
 
 def measure_runtime(func: typing.Callable) -> typing.Callable:
-    def wrapper(
-        img: cv2.typing.MatLike, width: int, height: int, filler=None
-    ) -> typing.Any:
+    def wrapper(*args, **kwargs) -> typing.Any:
         t1 = time()
-        result = func(img, width, height, filler)
+        result = func(*args, **kwargs)
         print(f"Tempo de execução da função {func.__name__}: {time() - t1}s")
         return result
 
@@ -21,7 +19,7 @@ def measure_runtime(func: typing.Callable) -> typing.Callable:
 
 @measure_runtime
 def blur_naive_algorithm(
-    img: cv2.typing.MatLike, width: int, height: int, filler=None
+    img: cv2.typing.MatLike, width: int, height: int, *args, **kwargs
 ) -> cv2.typing.MatLike:
     window_size = width * height
 
@@ -42,7 +40,7 @@ def blur_naive_algorithm(
 
 @measure_runtime
 def blur_separable_filter(
-    img: cv2.typing.MatLike, width: int, height: int, filler=None
+    img: cv2.typing.MatLike, width: int, height: int, *args, **kwargs
 ) -> cv2.typing.MatLike:
     img_step_1 = img.copy()
 
@@ -82,6 +80,7 @@ def blur_separable_filter(
     return img_out
 
 
+@measure_runtime
 def build_integral_image(img: cv2.typing.MatLike):
     integral_image = img.copy()
     # horizontal
@@ -109,6 +108,8 @@ def blur_integral_image(
     width: int,
     height: int,
     integral_image: cv2.typing.MatLike | None = None,
+    *args,
+    **kwargs,
 ) -> cv2.typing.MatLike:
     if type(integral_image) == type(None):
         integral_image = build_integral_image(img)
