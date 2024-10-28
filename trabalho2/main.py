@@ -47,12 +47,11 @@ def test(
             comparison = open_cv_right_image - result
             norm_comparison = cv2.normalize(comparison, None, 0, 1, cv2.NORM_MINMAX)
             if show_images:
+                im_show = np.concatenate([result, comparison, norm_comparison], axis=1)
                 cv2.imshow(
-                    f"{output_name_template}{window_index + 2} - Borrada {w_size} - algoritmo {name}",
-                    result,
+                    f"Resultado algoritmo {name} {w_size} VS Diferenca OpenCV e Resultado VS Diferenca normalizada",
+                    im_show,
                 )
-                cv2.imshow(f"opencv blur MENOS resultado", comparison)
-                cv2.imshow(f"opencv blur MENOS resultado, normalizado", norm_comparison)
                 cv2.waitKey()
                 cv2.destroyAllWindows()
 
