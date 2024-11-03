@@ -29,9 +29,11 @@ def get_windows(passes: int, sigma: float):
 
 
 IMG_PATH = "img/Wind Waker GC.bmp"
+OUT_PATTERN = "bloom - Wind Waker GC - {}.png"
 THRESHOLD_LUMINANCE = 0.5
 
 # IMG_PATH = "img/GT2.BMP"
+# OUT_PATTERN = "bloom - GT2 - {}.png"
 # THRESHOLD_LUMINANCE = 0.5
 
 img = cv2.imread(IMG_PATH).astype(np.float32) / 255.0
@@ -72,11 +74,14 @@ cv2.destroyAllWindows()
 final_g_mask = sum_g_mask
 final_b_mask = sum_b_mask
 
-bloom_g_img = 0.92 * img + 0.08 * final_g_mask
-bloom_b_img = 0.92 * img + 0.08 * final_b_mask
+bloom_g_img = np.clip(0.92 * img + 0.08 * final_g_mask, 0, 1)
+bloom_b_img = np.clip(0.92 * img + 0.08 * final_b_mask, 0, 1)
 
 cv2.imshow("original", img)
 cv2.imshow("bloom com filtro gaussiano", bloom_g_img)
 cv2.imshow("bloom com filtro da media", bloom_b_img)
 cv2.waitKey()
 cv2.destroyAllWindows()
+
+cv2.imwrite(OUT_PATTERN.format("filtro gaussiano"), bloom_g_img * 255)
+cv2.imwrite(OUT_PATTERN.format("filtro da media"), bloom_b_img * 255)
