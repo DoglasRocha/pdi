@@ -45,7 +45,9 @@ for row in range(img.shape[0]):
         if img_hls[row, col, 1] < THRESHOLD_LUMINANCE:
             mask[row, col, :] = 0
 
-# cv2.imshow("mask", mask)
+cv2.imshow("mask", mask)
+cv2.waitKey()
+cv2.destroyAllWindows()
 
 blurred_g_masks = []
 blurred_b_masks = []
