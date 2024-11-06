@@ -30,7 +30,7 @@ def get_windows(passes: int, sigma: float):
 
 IMG_PATH = "img/Wind Waker GC.bmp"
 OUT_PATTERN = "bloom - Wind Waker GC - {}.png"
-THRESHOLD_LUMINANCE = 0.5
+THRESHOLD_LUMINANCE = 0.525
 
 # IMG_PATH = "img/GT2.BMP"
 # OUT_PATTERN = "bloom - GT2 - {}.png"
