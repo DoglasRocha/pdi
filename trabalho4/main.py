@@ -120,10 +120,16 @@ diff = img - blurry
 binaria = diff.copy()
 binaria = binariza(binaria, 0.15)
 
+erodida = cv2.erode(binaria, np.ones((3, 3)))
+erodida1 = erodida.copy().reshape((img.shape[0], img.shape[1], 1))
+erodida = cv2.erode(erodida, np.ones((3, 3)))
+erodida2 = erodida.copy().reshape((img.shape[0], img.shape[1], 1))
+erodida = cv2.erode(erodida, np.ones((3, 3)))
 # erodida = cv2.erode(erodida, np.ones((3, 3)))
+erodida = erodida.reshape((img.shape[0], img.shape[1], 1))
 
 # rotula
-componentes = rotula(binaria, 3, 3, 6)
+componentes = rotula(erodida, 0, 0, 0)
 n_componentes = len(componentes)
 print("%d componentes detectados." % n_componentes)
 
@@ -131,11 +137,24 @@ print("%d componentes detectados." % n_componentes)
 for c in componentes:
     cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 0, 1))
 
+n_pixels = [_['n_pixels'] for _ in componentes]
+mean = np.mean(n_pixels)
+std = np.std(n_pixels)
+print(
+    "max", 
+    max(componentes, key=lambda componente: componente['n_pixels'])['n_pixels'], 
+    'min', 
+    min(componentes, key=lambda componente: componente['n_pixels'])['n_pixels'], 
+    "media", mean, 
+    "std", std
+)
+
 cv2.imshow("original", img)
-# cv2.imshow("erodida", erodida)
+cv2.imshow("binarizada", binaria)
+cv2.imshow("erodida", erodida)
+cv2.imshow("bordas", binaria - erodida1 - erodida2)
 # cv2.imshow("blur", blurry)
 # cv2.imshow("diff", diff)
-cv2.imshow("binarizada", binaria)
 cv2.imshow("saida", img_out)
 
 cv2.waitKey()
