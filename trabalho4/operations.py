@@ -23,3 +23,13 @@ def normalize_locally_and_binarize_image(img: cv2.typing.MatLike, threshold: flo
     binarized = reshape_image(binarized)
 
     return binarized
+
+def sharp_image(img: cv2.typing.MatLike, kernel: "tuple[int, int]"=(13,13)) -> cv2.typing.MatLike:
+    blurry = cv2.blur(img, kernel)
+    blurry = reshape_image(blurry)
+
+    details = img - blurry
+    
+    sharped_image = img + details
+
+    return sharped_image
