@@ -17,13 +17,7 @@ img = open_image(img_path)
 img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
 binarized_img = normalize_locally_and_binarize_image(img)
-non_noisy_img = supress_image_noise(binarized_img)
-# erodida1 = erodida.copy().reshape((img.shape[0], img.shape[1], 1))
-# erodida = cv2.erode(erodida, np.ones((3, 3)))
-# erodida2 = erodida.copy().reshape((img.shape[0], img.shape[1], 1))
-# erodida = cv2.erode(erodida, np.ones((3, 3)))
-# # erodida = cv2.erode(erodida, np.ones((3, 3)))
-
+non_noisy_img = supress_image_noise(binarized_img, (3,3))
 
 # rotula
 componentes = label(non_noisy_img, 0, 0, 0)

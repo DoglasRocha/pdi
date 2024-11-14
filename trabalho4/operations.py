@@ -1,8 +1,9 @@
-import cv2
+import cv2, numpy as np
 from img_utils import reshape_image
 from segmentation import binarize
 
 def supress_image_noise(img: cv2.typing.MatLike, kernel: "tuple[int, int]"=(3,3)) -> cv2.typing.MatLike:
+    kernel = np.ones(kernel)
     img = cv2.erode(img, kernel)
     img = cv2.dilate(img, kernel)
     img = reshape_image(img)
