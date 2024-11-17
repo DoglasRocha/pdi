@@ -15,7 +15,7 @@ def binarize(img, threshold):
 
 
 # -------------------------------------------------------------------------------
-def flood_fill(img, label, row, col, channel, dados_rotulo=None):
+def flood_fill(img, label, row, col, channel, dados_rotulo=None, updating=False):
     if dados_rotulo == None:
         dados_rotulo = {
             "label": label,
@@ -40,8 +40,9 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None):
 
                 dados_rotulo["n_pixels"] += 1
 
-                dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
-                dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
+                if not updating:
+                    dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
+                    dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
 
                 stack.append((neighbour_row, col))
 
@@ -54,15 +55,16 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None):
 
                 dados_rotulo["n_pixels"] += 1
 
-                dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
-                dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
+                if not updating:
+                    dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
+                    dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
 
                 stack.append((row, neighbour_col))
 
     return dados_rotulo
 
 
-def label(img, largura_min, altura_min, n_pixels_min):
+def label(img, largura_min=0, altura_min=0, n_pixels_min=0):
     """Rotulagem usando flood fill. Marca os objetos da imagem com os valores
     [0.1,0.2,etc].
 
@@ -81,14 +83,16 @@ def label(img, largura_min, altura_min, n_pixels_min):
 
     label = 2
     componentes = []
+    tmp_img = img.copy()
+
     # inundação
-    for row in range(len(img)):
-        for col in range(len(img[row])):
-            for channel in range(len(img[row][col])):
-                if img[row][col][channel] != 1:
+    for row in range(len(tmp_img)):
+        for col in range(len(tmp_img[row])):
+            for channel in range(len(tmp_img[row][col])):
+                if tmp_img[row][col][channel] != 1:
                     continue
 
-                dados_componente = flood_fill(img, label, row, col, channel)
+                dados_componente = flood_fill(tmp_img, label, row, col, channel)
                 if (
                     dados_componente["n_pixels"] < n_pixels_min
                     or dados_componente["R"] - dados_componente["L"] < largura_min
@@ -100,3 +104,36 @@ def label(img, largura_min, altura_min, n_pixels_min):
                 label += 1
 
     return componentes
+
+
+def update_components(
+    img: cv2.typing.MatLike,
+    components: list[dict],
+    largura_min=0,
+    altura_min=0,
+    n_pixels_min=0,
+) -> None:
+    tmp_img = img.copy()
+    label = 2
+    for i, c in enumerate(components):
+        # inundação
+        for row in range(c["T"], c["B"] + 1):
+            for col in range(c["L"], c["R"] + 1):
+                for channel in range(len(tmp_img[row, col])):
+                    if tmp_img[row, col, channel] != 1:
+                        continue
+
+                    components[i]["n_pixels"] = 1
+                    components[i] = flood_fill(
+                        tmp_img, label, row, col, channel, components[i], True
+                    )
+                    if (
+                        c["n_pixels"] < n_pixels_min
+                        or c["R"] - c["L"] < largura_min
+                        or c["B"] - c["T"] < altura_min
+                    ):
+                        continue
+
+                    label += 1
+
+    return components
