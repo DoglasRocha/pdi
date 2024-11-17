@@ -1,5 +1,6 @@
 import cv2, numpy as np
 
+
 def binarize(img, threshold):
     """Binarização simples por limiarização.
 
@@ -29,27 +30,34 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None):
 
     while len(stack) > 0:
         row, col = stack.pop()
-        # vizinhança-8
+        # vizinhança-4
         for neighbour_row in range(row - 1, row + 2):
-            if 0 > neighbour_row or neighbour_row >= len(img):
+            if 0 > neighbour_row or neighbour_row >= img.shape[0]:
                 continue
 
-            for neighbour_col in range(col - 1, col + 2):
-                if 0 > neighbour_col or neighbour_col >= len(img[neighbour_row]):
-                    continue
+            if img[neighbour_row][col][channel] == 1:
+                img[neighbour_row][col][channel] = label
 
-                if img[neighbour_row][neighbour_col][channel] == 1:
-                    img[neighbour_row][neighbour_col][channel] = label
+                dados_rotulo["n_pixels"] += 1
 
-                    dados_rotulo["n_pixels"] += 1
+                dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
+                dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
 
-                    dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
-                    dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
+                stack.append((neighbour_row, col))
 
-                    dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
-                    dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
+        for neighbour_col in range(col - 1, col + 2):
+            if 0 > neighbour_col or neighbour_col >= img.shape[1]:
+                continue
 
-                    stack.append((neighbour_row, neighbour_col))
+            if img[row][neighbour_col][channel] == 1:
+                img[row][neighbour_col][channel] = label
+
+                dados_rotulo["n_pixels"] += 1
+
+                dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
+                dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
+
+                stack.append((row, neighbour_col))
 
     return dados_rotulo
 
