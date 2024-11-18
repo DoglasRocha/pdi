@@ -108,7 +108,7 @@ def label(img, largura_min=0, altura_min=0, n_pixels_min=0):
 
 def update_components(
     img: cv2.typing.MatLike,
-    components: list[dict],
+    components: "list[dict]",
     largura_min=0,
     altura_min=0,
     n_pixels_min=0,
