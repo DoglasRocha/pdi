@@ -10,7 +10,7 @@ def supress_image_noise(img: cv2.typing.MatLike, kernel: "tuple[int, int]"=(3,3)
     return img
 
 
-def normalize_locally(img: cv2.typing.MatLike, kernel: "tuple[int, int]"=(60,60)) -> cv2.typing.MatLike:
+def normalize_locally(img: cv2.typing.MatLike, kernel: "tuple[int, int]"=(200,200)) -> cv2.typing.MatLike:
     blurry = cv2.blur(img, kernel)
     blurry = reshape_image(blurry)
 
