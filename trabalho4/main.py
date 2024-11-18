@@ -10,7 +10,7 @@ from img_utils import *
 from operations import *
 
 
-def calculate_metrics(components: list[dict]) -> "tuple[float, float, float, float]":
+def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
     n_pixels_per_component = [component["n_pixels"] for component in components]
     mean = np.mean(n_pixels_per_component)
     std = np.std(n_pixels_per_component)
@@ -22,7 +22,7 @@ def calculate_metrics(components: list[dict]) -> "tuple[float, float, float, flo
 
 def erode_abnormalities(
     img: cv2.typing.MatLike,
-    components: list[dict],
+    components: "list[dict]",
     threshold: float,
     kernel: "tuple[int, int]",
 ) -> cv2.typing.MatLike:
