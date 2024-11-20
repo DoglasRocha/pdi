@@ -128,6 +128,7 @@ def label(img, largura_min=0, altura_min=0, n_pixels_min=0):
                     or dados_componente["R"] - dados_componente["L"] < largura_min
                     or dados_componente["B"] - dados_componente["T"] < altura_min
                 ):
+                    label += 1
                     continue
 
                 componentes.append(dados_componente)
