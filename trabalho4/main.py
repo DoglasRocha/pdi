@@ -8,7 +8,6 @@ import cv2, numpy as np, sys, os
 from segmentation import *
 from img_utils import *
 from operations import *
-from time import sleep
 
 
 def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
@@ -60,7 +59,7 @@ def erode_abnormalities(
             for col in range(left, right + 1):
                 for channel in range(img.shape[2]):
                     if img[row, col, channel] == 1 and (row, col) not in c["positions"]:
-                        not_component.append(row, col)
+                        not_component.append((row, col))
                         img[row, col, channel] = 0
 
         component_area = img[top:bottom, left:right, :]
@@ -98,6 +97,48 @@ def classify_components(
     return small_components, normal_components, abnormal_components
 
 
+def remove_components_from_image(
+    img: cv2.typing.MatLike, components: "list[dict]"
+) -> cv2.typing.MatLike:
+    for c in components:
+        for row, col in c["positions"]:
+            for channel in range(img.shape[2]):
+                img[row, col, channel] = 0
+
+    cv2.destroyAllWindows()
+    return img
+
+
+def re_add_components_into_image(
+    img: cv2.typing.MatLike, components: "list[dict]"
+) -> cv2.typing.MatLike:
+    for c in components:
+        for row, col in c["positions"]:
+            for channel in range(img.shape[2]):
+                img[row, col, channel] = 1
+
+    return img
+
+
+def treat_normal_components(
+    img: cv2.typing.MatLike, components: "list[dict]"
+) -> "tuple[cv2.typing.MatLike, list[dict]]":
+    # se o centro do componente não está nas posições do componente, provavelmente é um arroz encostado no outro
+    tmp_components = components.copy()
+
+    for c in components:
+        center = (c["B"] + c["T"]) // 2, (c["R"] + c["L"]) // 2
+
+        if center not in c["positions"]:
+            while len(tmp_components) == len(components):
+                img = erode_abnormalities(img, [c], (3, 3))
+                tmp_components = label(img)
+
+            components = tmp_components
+
+    return img, components
+
+
 def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
@@ -110,14 +151,23 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
         components
     )
 
-    non_noisy_img = erode_abnormalities(non_noisy_img, abnormal_components, (3, 3))
-
+    # componentes pequenos são confiáveis (dada a remoção de ruido)
+    tmp_img = non_noisy_img.copy()
     final_components = small_components.copy()
+    tmp_img = remove_components_from_image(tmp_img, small_components)
+
+    # avalia componentes normais
+    tmp_img = remove_components_from_image(tmp_img, abnormal_components)
+
+    tmp_img, normal_components = treat_normal_components(tmp_img, normal_components)
+    final_components.extend(normal_components)
+
+    tmp_img = re_add_components_into_image(tmp_img, abnormal_components)
+    tmp_img = remove_components_from_image(tmp_img, normal_components)
 
     final_binarized = non_noisy_img
 
-    components = label(final_binarized)
-    print(f"{len(components)} componentes detectados.")
+    print(f"{len(final_components) + len(abnormal_components)} componentes detectados.")
     for c in normal_components:
         for row, col in c["positions"]:
             img_out[row, col] = [0, 0, 1]
