@@ -48,7 +48,7 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None, updating=False)
     if dados_rotulo == None:
         dados_rotulo = {
             "label": label,
-            "n_pixels": 1,
+            "n_pixels": 0,
             "T": row,
             "L": col,
             "B": row,

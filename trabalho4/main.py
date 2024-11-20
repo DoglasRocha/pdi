@@ -16,8 +16,9 @@ def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, f
     std = np.std(n_pixels_per_component)
     min_ = np.min(n_pixels_per_component)
     max_ = np.max(n_pixels_per_component)
+    median = np.median(n_pixels_per_component)
 
-    return mean, std, min_, max_
+    return mean, std, min_, max_, median
 
 
 def filter_abnormal_components(
@@ -79,7 +80,7 @@ def erode_abnormalities(
 def classify_components(
     components: "list[dict]",
 ) -> "tuple[list[dict], list[dict], list[dict]]":
-    mean, std, _, _ = calculate_metrics(components)
+    mean, std, _, _, _ = calculate_metrics(components)
 
     normal_components = components.copy()
     abnormal_components = []
@@ -92,7 +93,7 @@ def classify_components(
         normal_components = filter_normal_components(
             normal_components, mean - std, mean + std
         )
-        mean, std, _, _ = calculate_metrics(normal_components)
+        mean, std, _, _, _ = calculate_metrics(normal_components)
 
     return small_components, normal_components, abnormal_components
 
@@ -165,21 +166,44 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     tmp_img = re_add_components_into_image(tmp_img, abnormal_components)
     tmp_img = remove_components_from_image(tmp_img, normal_components)
 
-    final_binarized = non_noisy_img
+    # avalia componentes anormais
+    normal_mean, normal_std, normal_min, _, normal_median = calculate_metrics(
+        normal_components
+    )
+
+    # hipotese: numero max de arroz por blob = tamanho blob / (media ponderada da mediana + tamanho minimo)
+    for c in abnormal_components:
+        hip_n_rice = round(c["n_pixels"] / ((normal_median * 9 + normal_min) / 10))
+
+        # tenta chegar em numero de arrozes em numero de arrozes iteracoes
+        n_components = -1
+        i = 0
+        while n_components != hip_n_rice or i < hip_n_rice:
+            tmp_img = erode_abnormalities(tmp_img, [c], (5, 5))
+
+            frame = tmp_img[c["T"] : c["B"], c["L"] : c["R"], :]
+            tmp_components = label(frame)
+            n_components = len(tmp_components)
+            if n_components == hip_n_rice or n_components == 0:
+                break
+
+            i += 1
+
+    abnormal_components = label(tmp_img)
 
     print(f"{len(final_components) + len(abnormal_components)} componentes detectados.")
     for c in normal_components:
         for row, col in c["positions"]:
             img_out[row, col] = [0, 0, 1]
-        cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 0, 1), 2)
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 0, 1), 2)
     for c in abnormal_components:
         for row, col in c["positions"]:
             img_out[row, col] = [0, 1, 0]
-        cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 1, 0), 2)
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 1, 0), 2)
     for c in small_components:
         for row, col in c["positions"]:
             img_out[row, col] = [1, 0, 0]
-        cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (1, 0, 0), 2)
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (1, 0, 0), 2)
 
     return img_out
 
