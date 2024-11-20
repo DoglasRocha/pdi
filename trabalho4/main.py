@@ -45,31 +45,42 @@ def filter_small_components(components: "list[dict]", threshold: float) -> "list
 def erode_abnormalities(
     img: cv2.typing.MatLike,
     components: "list[dict]",
-    threshold: float,
     kernel: "tuple[int, int]",
 ) -> cv2.typing.MatLike:
 
     for c in components:
-        if c["n_pixels"] <= threshold:
-            continue
+        not_component = []
+        top = c["T"] - kernel[0] // 2
+        bottom = c["B"] + kernel[0] // 2
+        left = c["L"] - kernel[1] // 2
+        right = c["R"] + kernel[1] // 2
 
-        component_area = img[c["T"] - 1 : c["B"] + 1, c["L"] - 1 : c["R"] + 1, :]
+        # remove coisas que não são o componente
+        for row in range(top, bottom + 1):
+            for col in range(left, right + 1):
+                for channel in range(img.shape[2]):
+                    if img[row, col, channel] == 1 and (row, col) not in c["positions"]:
+                        not_component.append(row, col)
+                        img[row, col, channel] = 0
+
+        component_area = img[top:bottom, left:right, :]
         eroded_area = cv2.erode(component_area, np.ones(kernel))
         eroded_area = reshape_image(eroded_area)
-        img[c["T"] - 1 : c["B"] + 1, c["L"] - 1 : c["R"] + 1, :] = eroded_area
+
+        img[top:bottom, left:right, :] = eroded_area
+
+        # devolve coisas que não são o componente
+        for row, col in not_component:
+            for channel in range(img.shape[2]):
+                img[row, col, channel] = 1
 
     return img
 
 
-def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
-    img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-
-    binarized_img = normalize_locally_and_binarize_image(img)
-    non_noisy_img = supress_image_noise(binarized_img, (5, 5))
-
-    # labeling
-    components = label(non_noisy_img)
-    mean, std, min_, max_ = calculate_metrics(components)
+def classify_components(
+    components: "list[dict]",
+) -> "tuple[list[dict], list[dict], list[dict]]":
+    mean, std, _, _ = calculate_metrics(components)
 
     normal_components = components.copy()
     abnormal_components = []
@@ -82,7 +93,26 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
         normal_components = filter_normal_components(
             normal_components, mean - std, mean + std
         )
-        mean, std, min_, max_ = calculate_metrics(normal_components)
+        mean, std, _, _ = calculate_metrics(normal_components)
+
+    return small_components, normal_components, abnormal_components
+
+
+def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
+    img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+    binarized_img = normalize_locally_and_binarize_image(img)
+    non_noisy_img = supress_image_noise(binarized_img, (5, 5))
+
+    # labeling
+    components = label(non_noisy_img)
+    small_components, normal_components, abnormal_components = classify_components(
+        components
+    )
+
+    non_noisy_img = erode_abnormalities(non_noisy_img, abnormal_components, (3, 3))
+
+    final_components = small_components.copy()
 
     final_binarized = non_noisy_img
 
