@@ -14,6 +14,35 @@ def binarize(img, threshold):
     return img
 
 
+def inner_flood_fill(
+    img,
+    label,
+    row,
+    col,
+    channel,
+    changing_element,
+    stack,
+    dados_rotulo,
+    lower_side,
+    bigger_side,
+    updating=False,
+):
+    if 0 > row or row >= img.shape[0] or 0 > col or col >= img.shape[1]:
+        return
+
+    if img[row][col][channel] == 1:
+        img[row][col][channel] = label
+        dados_rotulo["positions"].append((row, col))
+
+        dados_rotulo["n_pixels"] += 1
+
+        if not updating:
+            dados_rotulo[lower_side] = min(changing_element, dados_rotulo[lower_side])
+            dados_rotulo[bigger_side] = max(changing_element, dados_rotulo[bigger_side])
+
+        stack.append((row, col))
+
+
 # -------------------------------------------------------------------------------
 def flood_fill(img, label, row, col, channel, dados_rotulo=None, updating=False):
     if dados_rotulo == None:
@@ -24,6 +53,7 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None, updating=False)
             "L": col,
             "B": row,
             "R": col,
+            "positions": [],
         }
 
     stack = [(row, col)]
@@ -32,34 +62,34 @@ def flood_fill(img, label, row, col, channel, dados_rotulo=None, updating=False)
         row, col = stack.pop()
         # vizinhança-4
         for neighbour_row in range(row - 1, row + 2):
-            if 0 > neighbour_row or neighbour_row >= img.shape[0]:
-                continue
-
-            if img[neighbour_row][col][channel] == 1:
-                img[neighbour_row][col][channel] = label
-
-                dados_rotulo["n_pixels"] += 1
-
-                if not updating:
-                    dados_rotulo["T"] = min(neighbour_row, dados_rotulo["T"])
-                    dados_rotulo["B"] = max(neighbour_row, dados_rotulo["B"])
-
-                stack.append((neighbour_row, col))
+            inner_flood_fill(
+                img=img,
+                label=label,
+                row=neighbour_row,
+                col=col,
+                channel=channel,
+                changing_element=neighbour_row,
+                stack=stack,
+                dados_rotulo=dados_rotulo,
+                lower_side="T",
+                bigger_side="B",
+                updating=updating,
+            )
 
         for neighbour_col in range(col - 1, col + 2):
-            if 0 > neighbour_col or neighbour_col >= img.shape[1]:
-                continue
-
-            if img[row][neighbour_col][channel] == 1:
-                img[row][neighbour_col][channel] = label
-
-                dados_rotulo["n_pixels"] += 1
-
-                if not updating:
-                    dados_rotulo["L"] = min(neighbour_col, dados_rotulo["L"])
-                    dados_rotulo["R"] = max(neighbour_col, dados_rotulo["R"])
-
-                stack.append((row, neighbour_col))
+            inner_flood_fill(
+                img=img,
+                label=label,
+                row=row,
+                col=neighbour_col,
+                channel=channel,
+                changing_element=neighbour_col,
+                stack=stack,
+                dados_rotulo=dados_rotulo,
+                lower_side="L",
+                bigger_side="R",
+                updating=updating,
+            )
 
     return dados_rotulo
 
