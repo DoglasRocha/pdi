@@ -9,6 +9,27 @@ from segmentation import *
 from img_utils import *
 from operations import *
 
+KERNEL_LINHA = [
+    [0, 0, 0, 0, 0], 
+    [0, 0, 0, 0, 0], 
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+]
+KERNEL_COLUNA = [
+    [0, 0, 0, 0, 0], 
+    [0, 0, 1, 0, 0], 
+    [0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0]
+]
+KERNEL_QUADRADO = [
+    [0, 0, 0, 0, 0], 
+    [0, 1, 0, 1, 0], 
+    [0, 0, 1, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0]
+]
 
 def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
     n_pixels_per_component = [component["n_pixels"] for component in components]
@@ -45,15 +66,15 @@ def filter_small_components(components: "list[dict]", threshold: float) -> "list
 def erode_abnormalities(
     img: cv2.typing.MatLike,
     components: "list[dict]",
-    kernel: "tuple[int, int]",
+    kernel: "np.ndarray",
 ) -> cv2.typing.MatLike:
-
+    kernel = kernel.astype(np.uint8)
     for c in components:
         not_component = []
-        top = c["T"] - kernel[0] // 2
-        bottom = c["B"] + kernel[0] // 2
-        left = c["L"] - kernel[1] // 2
-        right = c["R"] + kernel[1] // 2
+        top = c["T"] - kernel.shape[0] // 2
+        bottom = c["B"] + kernel.shape[0] // 2
+        left = c["L"] - kernel.shape[1] // 2
+        right = c["R"] + kernel.shape[1] // 2
 
         # remove coisas que não são o componente
         for row in range(top, bottom + 1):
@@ -64,7 +85,7 @@ def erode_abnormalities(
                         img[row, col, channel] = 0
 
         component_area = img[top:bottom, left:right, :]
-        eroded_area = cv2.erode(component_area, np.ones(kernel))
+        eroded_area = cv2.erode(component_area, kernel)
         eroded_area = reshape_image(eroded_area)
 
         img[top:bottom, left:right, :] = eroded_area
@@ -131,8 +152,20 @@ def treat_normal_components(
         center = (c["B"] + c["T"]) // 2, (c["R"] + c["L"]) // 2
 
         if center not in c["positions"]:
+            if c['B'] - c['T'] > (c['R'] - c['L']) * 1.75: 
+                kernel = KERNEL_LINHA
+                
+            elif c['R'] - c['L'] > (c['B'] - c['T']) * 1.75:
+                kernel = KERNEL_COLUNA
+                
+            else:
+                kernel = KERNEL_QUADRADO
             while len(tmp_components) == len(components):
-                img = erode_abnormalities(img, [c], (3, 3))
+                img = erode_abnormalities(
+                    img, 
+                    [c], 
+                    np.array(kernel)
+                )
                 tmp_components = label(img)
 
             components = tmp_components
@@ -143,8 +176,20 @@ def treat_normal_components(
 def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
-    binarized_img = normalize_locally_and_binarize_image(img)
-    non_noisy_img = supress_image_noise(binarized_img, (5, 5))
+    sharpen_img = sharp_image(img, kernel_size=(15, 15))
+    binarized_img = normalize_locally_and_binarize_image(sharpen_img)
+    non_noisy_img = supress_image_noise(
+        binarized_img, 
+        np.array(
+            [
+                [0, 0, 1, 0, 0],
+                [0, 1, 1, 1, 0],
+                [1, 1, 1, 1, 1],
+                [0, 1, 1, 1, 0],
+                [0, 0, 1, 0, 0]
+            ]
+        )
+    )
 
     # labeling
     components = label(non_noisy_img)
@@ -174,12 +219,26 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     # hipotese: numero max de arroz por blob = tamanho blob / (media ponderada da mediana + tamanho minimo)
     for c in abnormal_components:
         hip_n_rice = round(c["n_pixels"] / ((normal_median * 9 + normal_min) / 10))
+        if c['B'] - c['T'] > (c['R'] - c['L']) * 1.75: 
+            kernel = KERNEL_LINHA
+            
+        elif c['R'] - c['L'] > (c['B'] - c['T']) * 1.75:
+            kernel = KERNEL_COLUNA
+            
+        else:
+            kernel = KERNEL_QUADRADO
 
         # tenta chegar em numero de arrozes em numero de arrozes iteracoes
         n_components = -1
         i = 0
         while n_components != hip_n_rice or i < hip_n_rice:
-            tmp_img = erode_abnormalities(tmp_img, [c], (5, 5))
+            tmp_img = erode_abnormalities(
+                tmp_img, 
+                [c], 
+                np.array(
+                    kernel
+                )
+            )
 
             frame = tmp_img[c["T"] : c["B"], c["L"] : c["R"], :]
             tmp_components = label(frame)
@@ -192,18 +251,22 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     abnormal_components = label(tmp_img)
 
     print(f"{len(final_components) + len(abnormal_components)} componentes detectados.")
+    max_color = 0.8
     for c in normal_components:
+        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
         for row, col in c["positions"]:
-            img_out[row, col] = [0, 0, 1]
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 0, 1), 2)
+            img_out[row, col] = color
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
     for c in abnormal_components:
+        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
         for row, col in c["positions"]:
-            img_out[row, col] = [0, 1, 0]
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 1, 0), 2)
+            img_out[row, col] = color
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
     for c in small_components:
+        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
         for row, col in c["positions"]:
-            img_out[row, col] = [1, 0, 0]
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (1, 0, 0), 2)
+            img_out[row, col] = color
+        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
 
     return img_out
 
