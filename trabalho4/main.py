@@ -33,6 +33,9 @@ KERNEL_QUADRADO = [
 
 def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
     n_pixels_per_component = [component["n_pixels"] for component in components]
+    if len(n_pixels_per_component) == 0:
+        return 0, 0, 0, 0, 0
+    
     mean = np.mean(n_pixels_per_component)
     std = np.std(n_pixels_per_component)
     min_ = np.min(n_pixels_per_component)
@@ -193,80 +196,52 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
 
     # labeling
     components = label(non_noisy_img)
-    small_components, normal_components, abnormal_components = classify_components(
-        components
-    )
+    # small_components, normal_components, abnormal_components = classify_components(
+    #     components
+    # )
 
-    # componentes pequenos são confiáveis (dada a remoção de ruido)
-    tmp_img = non_noisy_img.copy()
-    final_components = small_components.copy()
-    tmp_img = remove_components_from_image(tmp_img, small_components)
+    # # componentes pequenos são confiáveis (dada a remoção de ruido)
+    # tmp_img = non_noisy_img.copy()
+    # final_components = small_components.copy()
+    # tmp_img = remove_components_from_image(tmp_img, small_components)
 
-    # avalia componentes normais
-    tmp_img = remove_components_from_image(tmp_img, abnormal_components)
+    # # avalia componentes normais
+    # tmp_img = remove_components_from_image(tmp_img, abnormal_components)
 
-    tmp_img, normal_components = treat_normal_components(tmp_img, normal_components)
-    final_components.extend(normal_components)
+    # tmp_img, normal_components = treat_normal_components(tmp_img, normal_components)
+    # final_components.extend(normal_components)
 
-    tmp_img = re_add_components_into_image(tmp_img, abnormal_components)
-    tmp_img = remove_components_from_image(tmp_img, normal_components)
+    # tmp_img = re_add_components_into_image(tmp_img, abnormal_components)
+    # tmp_img = remove_components_from_image(tmp_img, normal_components)
 
     # avalia componentes anormais
-    normal_mean, normal_std, normal_min, _, normal_median = calculate_metrics(
-        normal_components
-    )
+    # normal_mean, normal_std, normal_min, _, normal_median = calculate_metrics(
+    #     normal_components + abnormal_components
+    # )
+    
+    # print(f'{normal_std=} {normal_median=} {normal_mean=} {normal_min=}')
+    mean, std, min_, max_, median = calculate_metrics(components)
+    print(f'{std=} {median=} {mean=} {min_=} {std/mean=}')
+    coef_variacao = std / mean
+    aaaaaaa = np.log2(coef_variacao)
+    if aaaaaaa == np.nan: 
+        aaaaaaa = 0
+    print(aaaaaaa)
 
     # hipotese: numero max de arroz por blob = tamanho blob / (media ponderada da mediana + tamanho minimo)
-    for c in abnormal_components:
-        hip_n_rice = round(c["n_pixels"] / ((normal_median * 9 + normal_min) / 10))
-        if c['B'] - c['T'] > (c['R'] - c['L']) * 1.75: 
-            kernel = KERNEL_LINHA
-            
-        elif c['R'] - c['L'] > (c['B'] - c['T']) * 1.75:
-            kernel = KERNEL_COLUNA
-            
-        else:
-            kernel = KERNEL_QUADRADO
+    n_rice = 0
+    for c in components:
+        
+        hip_n_rice = round(c["n_pixels"] / (median - median * aaaaaaa))
+        n_rice += hip_n_rice
+        
 
-        # tenta chegar em numero de arrozes em numero de arrozes iteracoes
-        n_components = -1
-        i = 0
-        while n_components != hip_n_rice or i < hip_n_rice:
-            tmp_img = erode_abnormalities(
-                tmp_img, 
-                [c], 
-                np.array(
-                    kernel
-                )
-            )
-
-            frame = tmp_img[c["T"] : c["B"], c["L"] : c["R"], :]
-            tmp_components = label(frame)
-            n_components = len(tmp_components)
-            if n_components == hip_n_rice or n_components == 0:
-                break
-
-            i += 1
-
-    abnormal_components = label(tmp_img)
-
-    print(f"{len(final_components) + len(abnormal_components)} componentes detectados.")
+    print(f"{n_rice} componentes detectados.")
     max_color = 0.8
-    for c in normal_components:
+    for c in components:
         color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
         for row, col in c["positions"]:
             img_out[row, col] = color
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
-    for c in abnormal_components:
-        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
-        for row, col in c["positions"]:
-            img_out[row, col] = color
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
-    for c in small_components:
-        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
-        for row, col in c["positions"]:
-            img_out[row, col] = color
-        # cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color, 1)
 
     return img_out
 
