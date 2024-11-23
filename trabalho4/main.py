@@ -9,33 +9,12 @@ from segmentation import *
 from img_utils import *
 from operations import *
 
-KERNEL_LINHA = [
-    [0, 0, 0, 0, 0], 
-    [0, 0, 0, 0, 0], 
-    [0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0]
-]
-KERNEL_COLUNA = [
-    [0, 0, 0, 0, 0], 
-    [0, 0, 1, 0, 0], 
-    [0, 0, 1, 0, 0],
-    [0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0]
-]
-KERNEL_QUADRADO = [
-    [0, 0, 0, 0, 0], 
-    [0, 1, 0, 1, 0], 
-    [0, 0, 1, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0]
-]
 
 def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
     n_pixels_per_component = [component["n_pixels"] for component in components]
     if len(n_pixels_per_component) == 0:
         return 0, 0, 0, 0, 0
-    
+
     mean = np.mean(n_pixels_per_component)
     std = np.std(n_pixels_per_component)
     min_ = np.min(n_pixels_per_component)
@@ -66,41 +45,6 @@ def filter_small_components(components: "list[dict]", threshold: float) -> "list
     return result
 
 
-def erode_abnormalities(
-    img: cv2.typing.MatLike,
-    components: "list[dict]",
-    kernel: "np.ndarray",
-) -> cv2.typing.MatLike:
-    kernel = kernel.astype(np.uint8)
-    for c in components:
-        not_component = []
-        top = c["T"] - kernel.shape[0] // 2
-        bottom = c["B"] + kernel.shape[0] // 2
-        left = c["L"] - kernel.shape[1] // 2
-        right = c["R"] + kernel.shape[1] // 2
-
-        # remove coisas que não são o componente
-        for row in range(top, bottom + 1):
-            for col in range(left, right + 1):
-                for channel in range(img.shape[2]):
-                    if img[row, col, channel] == 1 and (row, col) not in c["positions"]:
-                        not_component.append((row, col))
-                        img[row, col, channel] = 0
-
-        component_area = img[top:bottom, left:right, :]
-        eroded_area = cv2.erode(component_area, kernel)
-        eroded_area = reshape_image(eroded_area)
-
-        img[top:bottom, left:right, :] = eroded_area
-
-        # devolve coisas que não são o componente
-        for row, col in not_component:
-            for channel in range(img.shape[2]):
-                img[row, col, channel] = 1
-
-    return img
-
-
 def classify_components(
     components: "list[dict]",
 ) -> "tuple[list[dict], list[dict], list[dict]]":
@@ -122,124 +66,35 @@ def classify_components(
     return small_components, normal_components, abnormal_components
 
 
-def remove_components_from_image(
-    img: cv2.typing.MatLike, components: "list[dict]"
-) -> cv2.typing.MatLike:
-    for c in components:
-        for row, col in c["positions"]:
-            for channel in range(img.shape[2]):
-                img[row, col, channel] = 0
-
-    cv2.destroyAllWindows()
-    return img
-
-
-def re_add_components_into_image(
-    img: cv2.typing.MatLike, components: "list[dict]"
-) -> cv2.typing.MatLike:
-    for c in components:
-        for row, col in c["positions"]:
-            for channel in range(img.shape[2]):
-                img[row, col, channel] = 1
-
-    return img
-
-
-def treat_normal_components(
-    img: cv2.typing.MatLike, components: "list[dict]"
-) -> "tuple[cv2.typing.MatLike, list[dict]]":
-    # se o centro do componente não está nas posições do componente, provavelmente é um arroz encostado no outro
-    tmp_components = components.copy()
-
-    for c in components:
-        center = (c["B"] + c["T"]) // 2, (c["R"] + c["L"]) // 2
-
-        if center not in c["positions"]:
-            if c['B'] - c['T'] > (c['R'] - c['L']) * 1.75: 
-                kernel = KERNEL_LINHA
-                
-            elif c['R'] - c['L'] > (c['B'] - c['T']) * 1.75:
-                kernel = KERNEL_COLUNA
-                
-            else:
-                kernel = KERNEL_QUADRADO
-            while len(tmp_components) == len(components):
-                img = erode_abnormalities(
-                    img, 
-                    [c], 
-                    np.array(kernel)
-                )
-                tmp_components = label(img)
-
-            components = tmp_components
-
-    return img, components
-
-
 def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     img_out = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
     sharpen_img = sharp_image(img, kernel_size=(15, 15))
     binarized_img = normalize_locally_and_binarize_image(sharpen_img)
     non_noisy_img = supress_image_noise(
-        binarized_img, 
-        np.array(
-            [
-                [0, 0, 1, 0, 0],
-                [0, 1, 1, 1, 0],
-                [1, 1, 1, 1, 1],
-                [0, 1, 1, 1, 0],
-                [0, 0, 1, 0, 0]
-            ]
-        )
+        binarized_img,
+        np.ones((5, 5)),
     )
 
     # labeling
     components = label(non_noisy_img)
-    # small_components, normal_components, abnormal_components = classify_components(
-    #     components
-    # )
 
-    # # componentes pequenos são confiáveis (dada a remoção de ruido)
-    # tmp_img = non_noisy_img.copy()
-    # final_components = small_components.copy()
-    # tmp_img = remove_components_from_image(tmp_img, small_components)
-
-    # # avalia componentes normais
-    # tmp_img = remove_components_from_image(tmp_img, abnormal_components)
-
-    # tmp_img, normal_components = treat_normal_components(tmp_img, normal_components)
-    # final_components.extend(normal_components)
-
-    # tmp_img = re_add_components_into_image(tmp_img, abnormal_components)
-    # tmp_img = remove_components_from_image(tmp_img, normal_components)
-
-    # avalia componentes anormais
-    # normal_mean, normal_std, normal_min, _, normal_median = calculate_metrics(
-    #     normal_components + abnormal_components
-    # )
-    
-    # print(f'{normal_std=} {normal_median=} {normal_mean=} {normal_min=}')
     mean, std, min_, max_, median = calculate_metrics(components)
-    print(f'{std=} {median=} {mean=} {min_=} {std/mean=}')
     coef_variacao = std / mean
-    aaaaaaa = np.log2(coef_variacao)
-    if aaaaaaa == np.nan: 
-        aaaaaaa = 0
-    print(aaaaaaa)
-
-    # hipotese: numero max de arroz por blob = tamanho blob / (media ponderada da mediana + tamanho minimo)
+    c2 = lambda x: 1 if x <= 1 else -(x ** (1 / 10)) + 2
+    constante_de_rocha = coef_variacao * c2(mean / median)
+    print(
+        f"{std=} {median=} {mean=} {min_=} {coef_variacao=} {median/mean=} {c2(mean / median)=}\n {constante_de_rocha=}"
+    )
     n_rice = 0
     for c in components:
-        
-        hip_n_rice = round(c["n_pixels"] / (median - median * aaaaaaa))
+        hip_n_rice = round(c["n_pixels"] / (median * constante_de_rocha))
         n_rice += hip_n_rice
-        
 
     print(f"{n_rice} componentes detectados.")
-    max_color = 0.8
+
     for c in components:
-        color = (np.random.uniform(high=max_color), np.random.uniform(high=max_color), np.random.uniform(high=max_color))
+        color = np.random.uniform(high=0.8, size=3)
         for row, col in c["positions"]:
             img_out[row, col] = color
 

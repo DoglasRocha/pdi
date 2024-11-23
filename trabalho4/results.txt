@@ -1,0 +1,13 @@
+std=126.92437543991178 median=337.0 mean=347.49056603773585 min_=185 std/mean=0.3652599173760832
+113 componentes detectados.
+std=267.6375629466088 median=240.0 mean=335.43 min_=70 std/mean=0.7978939359824965
+141 componentes detectados.
+std=313.6675698490362 median=230.0 mean=353.175 min_=29 std/mean=0.888136390879978
+195 componentes detectados.
+std=35.99587553533816 median=175.0 mean=177.38333333333333 min_=90 std/mean=0.20292704426574176
+60 componentes detectados.
+std=130.94508573382714 median=446.0 mean=466.82894736842104 min_=250 std/mean=0.28049907031683147
+82 componentes detectados.
+
+=======
+
