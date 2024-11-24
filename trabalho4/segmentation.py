@@ -135,36 +135,3 @@ def label(img, largura_min=0, altura_min=0, n_pixels_min=0):
                 label += 1
 
     return componentes
-
-
-def update_components(
-    img: cv2.typing.MatLike,
-    components: "list[dict]",
-    largura_min=0,
-    altura_min=0,
-    n_pixels_min=0,
-) -> None:
-    tmp_img = img.copy()
-    label = 2
-    for i, c in enumerate(components):
-        # inundação
-        for row in range(c["T"], c["B"] + 1):
-            for col in range(c["L"], c["R"] + 1):
-                for channel in range(len(tmp_img[row, col])):
-                    if tmp_img[row, col, channel] != 1:
-                        continue
-
-                    components[i]["n_pixels"] = 1
-                    components[i] = flood_fill(
-                        tmp_img, label, row, col, channel, components[i], True
-                    )
-                    if (
-                        c["n_pixels"] < n_pixels_min
-                        or c["R"] - c["L"] < largura_min
-                        or c["B"] - c["T"] < altura_min
-                    ):
-                        continue
-
-                    label += 1
-
-    return components
