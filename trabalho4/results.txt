@@ -11,3 +11,554 @@ std=130.94508573382714 median=446.0 mean=466.82894736842104 min_=250 std/mean=0.
 
 =======
 
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 median/mean=0.9708129124113571 c2(mean / median)=0.9970334580549931
+ constante_de_rocha=0.3656511940164337
+306 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 median/mean=0.7189916067506994 c2(mean / median)=0.9664592179637514
+ constante_de_rocha=0.7704945224999108
+168 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 median/mean=0.6623946922507816 c2(mean / median)=0.9579505814011113
+ constante_de_rocha=0.8351131469120349
+210 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 median/mean=0.9825581395348837 c2(mean / median)=0.9982388748484068
+ constante_de_rocha=0.2006216832810065
+304 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 median/mean=0.9559816518989145 c2(mean / median)=0.9954881964568933
+ constante_de_rocha=0.27926124006357467
+288 componentes detectados.
+
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 median/mean=0.9708129124113571 c2(mean / median)=0.9970334580549931
+ constante_de_rocha=0.3656511940164337
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 median/mean=0.7189916067506994 c2(mean / median)=0.9664592179637514
+ constante_de_rocha=0.7704945224999108
+141 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 median/mean=0.6623946922507816 c2(mean / median)=0.9579505814011113
+ constante_de_rocha=0.8351131469120349
+196 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 median/mean=0.9825581395348837 c2(mean / median)=0.9982388748484068
+ constante_de_rocha=0.2006216832810065
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 median/mean=0.9559816518989145 c2(mean / median)=0.9954881964568933
+ constante_de_rocha=0.27926124006357467
+82 componentes detectados.
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=1
+
+
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8251852749530576
+141 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.8943237688016672
+196 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=1
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8251852749530576
+158 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.8943237688016672
+202 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=0.37218761229094466
+302 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8251852749530576
+158 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.8943237688016672
+202 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=1
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8162714852840354
+160 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.8872540386317551
+202 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=1
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.9415653654014059
+200 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=0.970812912411357
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.9415653654014059
+200 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121 median=334.5 mean=344.5566037735849 min_=178 coef_variacao=0.36673914106126776 mean/median=1.0300645852723018 
+ constante_de_rocha=0.9424777109046213
+113 componentes detectados.
+std=265.0086826879451 median=239.0 mean=332.41 min_=70 coef_variacao=0.7972343873167025 mean/median=1.390836820083682 
+ constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+std=299.4103249109198 median=227.5 mean=343.45081967213116 min_=88 coef_variacao=0.8717705935212099 mean/median=1.5096739326247524 
+ constante_de_rocha=0.9415653654014059
+200 componentes detectados.
+std=34.567807760014716 median=169.0 mean=172.0 min_=89 coef_variacao=0.20097562651171347 mean/median=1.017751479289941 
+ constante_de_rocha=1
+60 componentes detectados.
+std=129.55545329255474 median=441.5 mean=461.82894736842104 min_=249 coef_variacao=0.2805269224261136 mean/median=1.0460451809024258 
+ constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9424777109046213
+113 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.9415653654014059
+200 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.9415653654014059
+200 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.8943237688016672
+202 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.8872540386317551
+202 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.8835554334684356
+202 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.8777949022475967
+203 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.8717705935212099
+204 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.87
+205 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+
+std=126.3623929149121
+median=334.5
+mean=344.5566037735849
+min_=178
+coef_variacao=0.36673914106126776
+mean/median=1.0300645852723018
+constante_de_rocha=0.9149695314061045
+114 componentes detectados.
+
+std=265.0086826879451
+median=239.0
+mean=332.41
+min_=70
+coef_variacao=0.7972343873167025
+mean/median=1.390836820083682
+constante_de_rocha=0.8894570869786007
+150 componentes detectados.
+
+std=299.4103249109198
+median=227.5
+mean=343.45081967213116
+min_=88
+coef_variacao=0.8717705935212099
+mean/median=1.5096739326247524
+constante_de_rocha=0.87
+205 componentes detectados.
+
+std=34.567807760014716
+median=169.0
+mean=172.0
+min_=89
+coef_variacao=0.20097562651171347
+mean/median=1.017751479289941
+constante_de_rocha=1
+60 componentes detectados.
+
+std=129.55545329255474
+median=441.5
+mean=461.82894736842104
+min_=249
+coef_variacao=0.2805269224261136
+mean/median=1.0460451809024258
+constante_de_rocha=1
+82 componentes detectados.
+

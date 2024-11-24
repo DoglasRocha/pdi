@@ -53,7 +53,7 @@ def classify_components(
     normal_components = components.copy()
     abnormal_components = []
     small_components = []
-    while std / mean > 0.2:  # and i < 100:
+    while std / mean > 0.30:  # and i < 100:
         abnormal_components.extend(
             filter_abnormal_components(normal_components, mean + std)
         )
@@ -79,24 +79,56 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     # labeling
     components = label(non_noisy_img)
 
-    mean, std, min_, max_, median = calculate_metrics(components)
-    coef_variacao = std / mean
-    c2 = lambda x: 1 if x <= 1 else -(x ** (1 / 10)) + 2
-    constante_de_rocha = coef_variacao * c2(mean / median)
-    print(
-        f"{std=} {median=} {mean=} {min_=} {coef_variacao=} {median/mean=} {c2(mean / median)=}\n {constante_de_rocha=}"
+    small_components, normal_components, big_components = classify_components(
+        components
     )
-    n_rice = 0
-    for c in components:
-        hip_n_rice = round(c["n_pixels"] / (median * constante_de_rocha))
-        n_rice += hip_n_rice
 
-    print(f"{n_rice} componentes detectados.")
+    mean, std, min_, max_, median = calculate_metrics(normal_components)
+    coef_variacao = std / mean
+
+    # arrozes pequenos e normais são confiáveis se o tratamento de ruído foi bem sucedido
+    for c in small_components:
+        c["rice_count"] = 1
+    n_rice = len(small_components)
+
+    for c in normal_components + big_components:
+        c["rice_count"] = round(c["n_pixels"] / (median - (std * coef_variacao)))
+        n_rice += c["rice_count"]
+
+    print(
+        f"{std=}",
+        f"{median=}",
+        f"{mean=}",
+        f"{min_=}",
+        f"{n_rice} componentes detectados.",
+        sep="\n",
+        end="\n\n",
+    )
 
     for c in components:
-        color = np.random.uniform(high=0.8, size=3)
+        color = np.random.uniform(low=0.2, high=0.8, size=3)
         for row, col in c["positions"]:
             img_out[row, col] = color
+        img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color)
+        # outline
+        img_out = cv2.putText(
+            img_out,
+            str(c["rice_count"]),
+            (c["L"], c["T"]),
+            cv2.FONT_HERSHEY_COMPLEX_SMALL,
+            1,
+            (0, 0, 0),
+            2,
+        )
+        # texto
+        img_out = cv2.putText(
+            img_out,
+            str(c["rice_count"]),
+            (c["L"], c["T"]),
+            cv2.FONT_HERSHEY_COMPLEX_SMALL,
+            1,
+            color,
+        )
 
     return img_out
 
