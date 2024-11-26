@@ -2,29 +2,28 @@
 # Autor: Doglas Franco Maurer da Rocha
 # Universidade Tecnológica Federal do Paraná
 # ===============================================================================
-
-# processo: normalizacao local -> binarizacao -> segmentacao -> ver no que dá
 import cv2, numpy as np, sys, os
 from segmentation import *
 from img_utils import *
 from operations import *
 
 
-def calculate_metrics(components: "list[dict]") -> "tuple[float, float, float, float]":
+def calculate_metrics(components: "list[dict]") -> "dict":
     n_pixels_per_component = [component["n_pixels"] for component in components]
     if len(n_pixels_per_component) == 0:
         return 0, 0, 0, 0, 0
 
-    mean = np.mean(n_pixels_per_component)
-    std = np.std(n_pixels_per_component)
-    min_ = np.min(n_pixels_per_component)
-    max_ = np.max(n_pixels_per_component)
-    median = np.median(n_pixels_per_component)
+    return {
+        'mean': np.mean(n_pixels_per_component),
+        'std': np.std(n_pixels_per_component),
+        'min': np.min(n_pixels_per_component),
+        'max': np.max(n_pixels_per_component),
+        'median': np.median(n_pixels_per_component),
+        'cv': np.std(n_pixels_per_component) / np.mean(n_pixels_per_component)
+    }
 
-    return mean, std, min_, max_, median
 
-
-def filter_abnormal_components(
+def filter_big_components(
     components: "list[dict]", threshold: float
 ) -> "list[dict]":
     result = list(filter(lambda c: c["n_pixels"] > threshold, components))
@@ -48,20 +47,20 @@ def filter_small_components(components: "list[dict]", threshold: float) -> "list
 def classify_components(
     components: "list[dict]",
 ) -> "tuple[list[dict], list[dict], list[dict]]":
-    mean, std, _, _, _ = calculate_metrics(components)
+    metrics = calculate_metrics(components)
 
     normal_components = components.copy()
     abnormal_components = []
     small_components = []
-    while std / mean > 0.30:  # and i < 100:
+    while metrics['cv'] > 0.2:
         abnormal_components.extend(
-            filter_abnormal_components(normal_components, mean + std)
+            filter_big_components(normal_components, metrics['mean'] + metrics['std'])
         )
-        small_components.extend(filter_small_components(normal_components, mean - std))
+        small_components.extend(filter_small_components(normal_components, metrics['mean'] - metrics['std']))
         normal_components = filter_normal_components(
-            normal_components, mean - std, mean + std
+            normal_components, metrics['mean'] - metrics['std'], metrics['mean'] + metrics['std']
         )
-        mean, std, _, _, _ = calculate_metrics(normal_components)
+        metrics = calculate_metrics(normal_components)
 
     return small_components, normal_components, abnormal_components
 
@@ -84,142 +83,74 @@ def count_rice(img: cv2.typing.MatLike) -> cv2.typing.MatLike:
     )
 
     # metricas dos componentes normais
-    normal_mean, normal_std, _, _, normal_median = calculate_metrics(normal_components)
-    normal_coef_variation = normal_std / normal_mean
+    normal_metrics = calculate_metrics(normal_components)
 
-    # metricas globais
-    # global_mean, _, _
-
-    # arrozes pequenos e normais são confiáveis se o tratamento de ruído foi bem sucedido
+    # arrozes pequenos são confiáveis se o tratamento de ruído foi bem sucedido
     for c in small_components:
         c["rice_count"] = 1
-    n_rice = len(small_components)
-
-    # constante_de_rocha =
+    rice_count = len(small_components)
+ 
+    # hehehehehe
+    # o parametro de rocha serve para dar um leve shift pra esquerda na mediana, 
+    # para melhorar a contagem de arrozes quebrados em componentes
+    parametro_de_rocha = (normal_metrics['std'] * normal_metrics['cv'])
 
     for c in normal_components + big_components:
         c["rice_count"] = round(
-            c["n_pixels"] / (normal_median - (normal_std * normal_coef_variation))
+            c["n_pixels"] / (
+                normal_metrics['median'] - parametro_de_rocha
+            ) # métricas dos componentes "normais" (tamanho médio) são mais confiáveis
+            # para o cálculo de arrozes por componente
         )
-        n_rice += c["rice_count"]
+        rice_count += c["rice_count"]
 
-    print(
-        # f"{std=}",
-        # f"{median=}",
-        # f"{mean=}",
-        f"{n_rice} componentes detectados.",
-        sep="\n",
-        end="\n\n",
+    components_and_colors = (
+        (small_components, (0, 1, 0)), 
+        (normal_components, (1, 0, 0)), 
+        (big_components, (0, 0, 1))
     )
+    for components_, color in components_and_colors:
+        for c in components_:
+            for row, col in c["positions"]:
+                img_out[row, col] = color
+            img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color)
+            # outline
+            img_out = cv2.putText(
+                img_out,
+                str(c["rice_count"]),
+                (c["L"], c["T"]),
+                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                1,
+                (0, 0, 0),
+                2,
+            )
+            # texto
+            img_out = cv2.putText(
+                img_out,
+                str(c["rice_count"]),
+                (c["L"], c["T"]),
+                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                1,
+                color,
+            )
 
-    for c in small_components:
-        for row, col in c["positions"]:
-            img_out[row, col] = (0, 0, 1)
-        img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 0, 1))
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (0, 0, 0),
-            2,
-        )
-        # texto
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (0, 0, 1),
-        )
+    return img_out, rice_count
 
-    for c in normal_components:
-        for row, col in c["positions"]:
-            img_out[row, col] = (0, 1, 0)
-        img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (0, 1, 0))
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (0, 0, 0),
-            2,
-        )
-        # texto
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (0, 1, 0),
-        )
+if __name__ == '__main__':
+    assert (
+        len(sys.argv) >= 2
+    ), "\n\nPor favor, insira como argumento para o script um caminho para uma imagem.\n\tExemplo: python main.py 205.bmp"
+    img_path = sys.argv[1]
+    assert os.path.exists(img_path), "Por favor, insira um caminho válido"
 
-    for c in big_components:
-        for row, col in c["positions"]:
-            img_out[row, col] = (1, 0, 0)
-        img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), (1, 0, 0))
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (0, 0, 0),
-            2,
-        )
-        # texto
-        img_out = cv2.putText(
-            img_out,
-            str(c["rice_count"]),
-            (c["L"], c["T"]),
-            cv2.FONT_HERSHEY_COMPLEX_SMALL,
-            1,
-            (1, 0, 0),
-        )
+    img = open_image(img_path)
+    img_out, rice_count = count_rice(img)
 
-    # for c in components:
-    #     color = np.random.uniform(low=0.2, high=0.8, size=3)
-    #     for row, col in c["positions"]:
-    #         img_out[row, col] = color
-    #     img_out = cv2.rectangle(img_out, (c["L"], c["T"]), (c["R"], c["B"]), color)
-    #     # outline
-    #     img_out = cv2.putText(
-    #         img_out,
-    #         str(c["rice_count"]),
-    #         (c["L"], c["T"]),
-    #         cv2.FONT_HERSHEY_COMPLEX_SMALL,
-    #         1,
-    #         (0, 0, 0),
-    #         2,
-    #     )
-    #     # texto
-    #     img_out = cv2.putText(
-    #         img_out,
-    #         str(c["rice_count"]),
-    #         (c["L"], c["T"]),
-    #         cv2.FONT_HERSHEY_COMPLEX_SMALL,
-    #         1,
-    #         color,
-    #     )
+    print(f"Contagem de arrozes na imagem {img_path}: {rice_count}")
+    cv2.imshow("original", img)
+    cv2.imshow("saida", img_out)
 
-    return img_out
+    cv2.waitKey()
+    cv2.destroyAllWindows()
 
-
-assert (
-    len(sys.argv) >= 2
-), "Por favor, insira como argumento para o script um caminho para uma imagem"
-img_path = sys.argv[1]
-assert os.path.exists(img_path), "Por favor, insira um caminho válido"
-
-img = open_image(img_path)
-img_out = count_rice(img)
-
-cv2.imshow("original", img)
-cv2.imshow("saida", img_out)
-
-cv2.waitKey()
-cv2.destroyAllWindows()
+    cv2.imwrite(f"{os.path.basename(img_path)} -> {rice_count}.png", img_out * 255)
