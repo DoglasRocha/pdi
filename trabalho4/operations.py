@@ -20,8 +20,6 @@ def normalize_locally(
     blurry = cv2.blur(img, kernel_size)
     blurry = reshape_image(blurry)
 
-    # img = cv2.GaussianBlur(img, (3, 3), 0)
-    # img = reshape_image(img)
     return img - blurry
 
 
@@ -33,16 +31,3 @@ def normalize_locally_and_binarize_image(
     binarized = reshape_image(binarized)
 
     return binarized
-
-
-def sharp_image(
-    img: cv2.typing.MatLike, kernel_size: "tuple[int, int]" = (13, 13)
-) -> cv2.typing.MatLike:
-    blurry = cv2.blur(img, kernel_size)
-    blurry = reshape_image(blurry)
-
-    details = img - blurry
-
-    sharped_image = img + details
-
-    return sharped_image
