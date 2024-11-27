@@ -1,0 +1,2 @@
+Objetivo: escreva um programa para estimar quantos grãos de arroz aparecem em cada uma das imagens dadas (e, possivelmente, em outras que não sejam estas!).
+-> Use os mesmos parâmetros para todas as imagens.
