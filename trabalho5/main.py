@@ -29,17 +29,18 @@ def main() -> None:
             b, g, r = img[row, col]
             if g > b and g > r:
                 #print(g * 2 / (b + r))
-                mask[row,col] = g / (b + r)
+                mask[row,col] = g ** 2 / (b + r)
             else:
                 mask[row,col] = 0
-                
+              
+    mask = np.clip(mask, 0, 1)  
     mask = cv2.normalize(mask, None, 0, 1, cv2.NORM_MINMAX)
     
     stamped_img = img.copy()
     for row in range(stamped_img.shape[0]):
         for col in range(stamped_img.shape[1]):
             if mask[row, col] != 0:
-                #print(mask[row, col], stamp_img[row, col])
+                # print(mask[row, col], stamp_img[row, col])
                 # stamped_img[row, col] = stamp_img[row, col]
                 stamped_img[row, col] = mask[row, col] * stamp_img[row, col]# + (1 - mask[row, col]) * img[row, col]
     
