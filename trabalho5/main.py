@@ -22,29 +22,36 @@ def main() -> None:
     
     stamp_img = cv2.resize(stamp_img, img.shape[::-1][1:])
     
-    mask = np.zeros(img.shape[:-1])
+    pure_mask = np.zeros(img.shape[:-1])
+    border_mask = np.zeros(img.shape[:-1])
     
     for row in range(img.shape[0]):
         for col in range(img.shape[1]):
             b, g, r = img[row, col]
-            if g > b and g > r:
+            # if g > b and g > r:
+            if g > b + r and g > 0.2:
                 #print(g * 2 / (b + r))
-                mask[row,col] = g ** 2 / (b + r)
-            else:
-                mask[row,col] = 0
+                # pure_mask[row,col] = g ** 2 / (b + r)
+                pure_mask[row,col] = g
+            elif g > b + r:# and g > r:
+                border_mask[row,col] = g
+    
               
-    mask = np.clip(mask, 0, 1)  
-    mask = cv2.normalize(mask, None, 0, 1, cv2.NORM_MINMAX)
+    # mask = np.clip(mask, 0, 1)  
+    pure_mask = cv2.normalize(pure_mask, None, 0, 1, cv2.NORM_MINMAX)
     
     stamped_img = img.copy()
     for row in range(stamped_img.shape[0]):
         for col in range(stamped_img.shape[1]):
-            if mask[row, col] != 0:
+            if pure_mask[row, col] != 0:
                 # print(mask[row, col], stamp_img[row, col])
                 # stamped_img[row, col] = stamp_img[row, col]
-                stamped_img[row, col] = mask[row, col] * stamp_img[row, col]# + (1 - mask[row, col]) * img[row, col]
+                stamped_img[row, col] = pure_mask[row, col] * stamp_img[row, col]# + (1 - mask[row, col]) * img[row, col]
+            elif border_mask[row, col] != 0:
+                stamped_img[row, col] = border_mask[row, col] * stamp_img[row, col]
     
-    cv2.imshow("mask", mask)
+    cv2.imshow("mask", pure_mask)
+    cv2.imshow("border mask", border_mask)
     cv2.imshow("stamp", stamp_img)
     cv2.imshow("result", stamped_img)
     cv2.waitKey()
