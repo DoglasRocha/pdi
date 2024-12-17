@@ -35,7 +35,7 @@ def main() -> None:
                 # print(b, g, r)
                 mask[row, col] = 1 - g
 
-    mask = np.where(mask > 0.80, 1.0, mask)
+    mask = np.where(mask > 0.85, 1.0, mask)
     mask = cv2.normalize(mask, None, 0.0, 1.0, cv2.NORM_MINMAX)
     mask = np.round(mask, 3)
 
